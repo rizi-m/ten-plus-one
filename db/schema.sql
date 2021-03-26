@@ -28,7 +28,8 @@ CREATE TABLE IF NOT EXISTS Movies (
 	title VARCHAR (100) NOT NULL,
 	release_year INTEGER,
 	imdb_url VARCHAR (300),
-	image_url VARCHAR (300)
+	image_url VARCHAR (300),
+	trailer_url VARCHAR(300)
 );
 
 CREATE TABLE IF NOT EXISTS Genre (
@@ -72,7 +73,7 @@ CREATE TABLE IF NOT EXISTS SuggestedMovies (
 CREATE TABLE IF NOT EXISTS MovieRankings (
 	user_id SERIAL NOT NULL,
 	approved_movie_id SERIAL NOT NULL,
-	ranking SERIAL NOT NULL,
+	ranking INTEGER NOT NULL,
 	CONSTRAINT fk_users
 		FOREIGN KEY(user_id)
 			REFERENCES users(id),

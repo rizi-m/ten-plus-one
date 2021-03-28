@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS Users (
 	id SERIAL PRIMARY KEY,
 	usertype_id SERIAL,
 	displayname VARCHAR (30) NOT NULL,
-	usernname VARCHAR (30) NOT NULL UNIQUE,
+	username VARCHAR (30) NOT NULL UNIQUE,
 	passwordhash VARCHAR (64) NOT NULL,
 	CONSTRAINT fk_users
 		FOREIGN KEY(usertype_id)

@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
+import { getCookie } from '../utils/cookies';
 
 
 const Secret = () => {
   const [user, setUser] = useState();
+  console.log(getCookie('token'))
   useEffect(() => {
     fetch('/api/secret', {
       headers: {
-        Authorization: "Bearer " + localStorage.getItem("token")
+        Authorization: "Bearer " + getCookie("token")
       }
     }).then(res => {
       console.log(res);

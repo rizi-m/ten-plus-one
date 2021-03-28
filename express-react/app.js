@@ -5,25 +5,18 @@ const logger = require('morgan');
 const passport = require('passport');
 const LocalStrategy = require('passport-local');
 const passportJWT = require('passport-jwt');
-const { Pool } = require('pg');
+
 require('dotenv-flow').config();
 
 JWTStrategy = passportJWT.Strategy;
 
 const apiRouter = require('./routes/api');
+const sessionRouter = require('./routes/session');
+const { getPool } = require('./pgpool');
 const app = express();
 app.use(passport.initialize());
 
-const pool = new Pool({
-  host: 'localhost',
-  port: process.env.PGPORT,
-  user: process.env.PGUSER,
-  password: process.env.PGPASS,
-  database: process.env.PGDB
-});
-
-pool.connect();
-
+let pool = getPool();
 
 passport.use(new LocalStrategy({
   usernameField: 'username'
@@ -63,6 +56,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'client/build')));
 
 app.use('/api', apiRouter);
+app.use('/api', sessionRouter);
 
 app.get('*', (req, res) => res.sendFile(path.join(__dirname, '/client/build/index.html')));
 

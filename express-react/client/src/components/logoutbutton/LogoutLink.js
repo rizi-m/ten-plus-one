@@ -5,7 +5,7 @@ import { deleteCookie } from '../../utils/cookies';
 
 
 const LogoutButton = () => {
-  const { user, setUser } = useContext(UserContext);
+  const { setUser } = useContext(UserContext);
   const history = useHistory();
 
   const logout = (event) => {

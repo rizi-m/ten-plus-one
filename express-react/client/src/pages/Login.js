@@ -4,7 +4,7 @@ import { UserContext } from '../context/UserContext';
 import { setCookie } from '../utils/cookies';
 
 const Login = () => {
-  const { user, setUser } = useContext(UserContext);
+  const { setUser } = useContext(UserContext);
   const history = useHistory();
 
   const onSubmit = (event) => {
@@ -21,7 +21,6 @@ const Login = () => {
     }).then(res => {
       if (res.status === 200) {
         res.json().then(data => {
-          // TODO: Store in cookie
           setUser(data.user);
           setCookie('token', data.token);
         });

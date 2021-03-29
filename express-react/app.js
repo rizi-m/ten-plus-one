@@ -21,11 +21,8 @@ let pool = getPool();
 passport.use(new LocalStrategy({
   usernameField: 'username'
 }, async (username, password, done) => {
-  console.log(username, password);
-  console.log(typeof (username));
-  username = username.replace(/'/g, "''");
-  //TODO: Prevent SQL injection
-  const res = await pool.query(`select * from users where username='${username}'`);
+  const sql = 'SELECT * FROM Users WHERE username=$1'
+  const res = await pool.query(sql, [username]);
   if (res.rows.length == 1) {
     const user = res.rows[0];
     if (username === user.username && password === user.passwordhash) {
@@ -39,7 +36,8 @@ passport.use(new JWTStrategy({
   jwtFromRequest: passportJWT.ExtractJwt.fromAuthHeaderAsBearerToken(),
   secretOrKey: process.env.JWTSECRET
 }, async (jwt_payload, done) => {
-  const res = await pool.query(`select * from users where id='${jwt_payload.user._id}'`);
+  const sql = 'SELECT * FROM Users WHERE id=$1';
+  const res = await pool.query(sql, [jwt_payload.user._id]);
   if (res.rows.length == 1) {
     return done(null, res.rows[0]);
   }

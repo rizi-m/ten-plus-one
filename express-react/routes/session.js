@@ -25,8 +25,8 @@ router.get('/check', passport.authenticate('jwt', { session: false }), async (re
         })
     } else {
         const pool = getPool();
-        //TODO: prevent SQL injection
-        const result = await pool.query(`select * from users where id='${req.user.id}'`);
+        const sql = 'SELECT id, usertype_id, displayname, username FROM Users WHERE id=$1';
+        const result = await pool.query(sql, [req.user.id]);
         res.json({
             isAuthenticated: true,
             user: result.rows[0]

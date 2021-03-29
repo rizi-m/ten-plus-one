@@ -12,7 +12,6 @@ function App() {
   const [checked, setChecked] = useState(false);
   const userValue = useMemo(() => ({ user, setUser }), [user, setUser]);
 
-
   useEffect(() => {
     if (!checked) {
       fetch('/api/check', {
@@ -20,15 +19,21 @@ function App() {
           Authorization: "Bearer " + getCookie("token")
         }
       }).then(res => {
+        setChecked(true);
         if (res.status === 200) {
           return res.json();
         }
       }).then(body => {
-        setChecked(true);
+
         if (body && body.isAuthenticated) {
+          console.log('setting user', body.user);
           setUser(body.user);
         }
-      }).catch(err => console.error(err));
+      }).catch(err => {
+        setChecked(true);
+        console.error(err)
+      }
+      );
     }
   })
 

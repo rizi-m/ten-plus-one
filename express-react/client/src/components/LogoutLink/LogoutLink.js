@@ -1,10 +1,10 @@
 import React, { useContext } from 'react';
 import { Link, useHistory } from 'react-router-dom';
-import { UserContext } from '../../context/UserContext';
-import { deleteCookie } from '../../utils/cookies';
+import { UserContext } from 'context/UserContext';
+import { deleteCookie } from 'utils/cookies';
 
 
-const LogoutButton = () => {
+const LogoutLink = () => {
   const { setUser } = useContext(UserContext);
   const history = useHistory();
 
@@ -27,4 +27,4 @@ const LogoutButton = () => {
   );
 }
 
-export default LogoutButton;
+export default LogoutLink;

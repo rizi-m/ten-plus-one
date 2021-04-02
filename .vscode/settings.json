@@ -5,6 +5,7 @@
         "PGPASS",
         "PGPORT",
         "PGUSER",
+        "chakra",
         "displayname",
         "passwordhash",
         "pgpool",

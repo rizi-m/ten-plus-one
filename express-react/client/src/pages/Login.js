@@ -1,60 +1,32 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { useHistory } from 'react-router';
-import { UserContext } from '../context/UserContext';
-import { setCookie } from '../utils/cookies';
+import { UserContext } from 'context/UserContext';
+import { logIn } from 'utils/session';
+import LoginForm from 'components/LoginForm';
+import Center from 'components/Center';
 
 const Login = () => {
-  const { setUser } = useContext(UserContext);
+  const { user, setUser } = useContext(UserContext);
   const history = useHistory();
 
-  const onSubmit = (event) => {
-    event.preventDefault();
-    fetch('/api/login', {
-      method: 'POST',
-      body: JSON.stringify({
-        username: event.target.username.value,
-        password: event.target.password.value
-      }),
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    }).then(res => {
-      if (res.status === 200) {
-        res.json().then(data => {
-          setUser(data.user);
-          setCookie('token', data.token);
-        });
-        history.push('/');
-      } else {
-        throw new Error(res.error);
-      }
-    }).catch(err => {
-      console.error(err);
-    });
-  }
+  useEffect(() => {
+    if (user) {
+      history.push('/dashboard');
+      return;
+    }
+    logIn()
+      .then((body) => {
+        setUser(body.user);
+        history.push('/dashboard');
+      })
+      .catch(console.error);
+  });
 
   return (
-    <>
-      <h3>
-        Login
-      </h3>
-      <form onSubmit={onSubmit}>
-        <div>
-          <label>
-            Username
-            <input name='username' type='text' placeholder='username' />
-          </label>
-        </div>
-        <div>
-          <label>
-            Password
-            <input name='password' type='password' placeholder='password' />
-          </label>
-        </div>
-        <button type='submit'>Log In</button>
-      </form>
-    </>
-  )
-}
+    <Center className='m-3'>
+      <LoginForm />
+    </Center>
+  );
+};
 
 export default Login;

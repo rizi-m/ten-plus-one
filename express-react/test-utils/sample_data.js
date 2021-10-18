@@ -14,6 +14,12 @@ const movies = [
   },
 ];
 
+const userTypes = ['admin', 'original', 'guest'];
+
+const users = [{ displayName: 'Displayer', username: 'Userrer' }];
+
 module.exports = {
   sampleMovies: movies,
+  sampleUserTypes: userTypes,
+  sampleUsers: users,
 };

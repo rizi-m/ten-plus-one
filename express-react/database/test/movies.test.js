@@ -1,10 +1,14 @@
 const rewire = require('rewire');
-const { clearDatabase } = require('../../test-utils/database');
+const { clearDatabase, addTestUsers } = require('../../test-utils/database');
 const { sampleMovies } = require('../../test-utils/sample_data');
-const movies = rewire('../movies');
+const movies = require('../movies');
 
 const { getPool } = require('../../test-utils/test-pgpool');
+const { Pool } = require('pg');
 
+/**
+ * @type {Pool}
+ */
 let pool;
 
 beforeAll(() => {
@@ -17,16 +21,15 @@ afterEach(async () => {
   );
 });
 
-
 afterAll(async () => {
   pool.end();
 });
 
 test('Add movie to the database', async () => {
   const movieData = sampleMovies[0];
-  const addMovie = movies.__get__('addMovie');
+  const { addMovie } = movies(pool);
 
-  await addMovie(pool, movieData);
+  await addMovie(movieData);
 
   const getMovieSql =
     'SELECT title, imdb_url FROM Movies \
@@ -46,12 +49,12 @@ test('Add movie to the database', async () => {
 test('Adding genres to the database', async () => {
   const genres1 = ['Comedy', 'Horror'];
   const genres2 = ['Action', 'Adventure', 'Comedy'];
-  const addGenres = movies.__get__('addGenres');
+  const { addGenres } = movies(pool);
 
-  const genre1ids = await addGenres(pool, genres1);
+  const genre1ids = await addGenres(genres1);
   expect(genre1ids.length).toBe(2);
 
-  const genre2ids = await addGenres(pool, genres2);
+  const genre2ids = await addGenres(genres2);
   expect(genre2ids.length).toBe(3);
 
   const selectAllGenresResult = await pool.query('SELECT * FROM Genres');
@@ -60,14 +63,12 @@ test('Adding genres to the database', async () => {
 
 test('Adding movie genres to database for given movie and genres', async () => {
   const movieData = sampleMovies[0];
-  const addMovie = movies.__get__('addMovie');
-  const addGenres = movies.__get__('addGenres');
-  const addMovieGenres = movies.__get__('addMovieGenres');
+  const { addMovie, addGenres, addMovieGenres } = movies(pool);
 
-  const movieId = await addMovie(pool, movieData);
-  const genreIds = await addGenres(pool, movieData.genres);
+  const movieId = await addMovie(movieData);
+  const genreIds = await addGenres(movieData.genres);
 
-  await addMovieGenres(pool, movieId, genreIds);
+  await addMovieGenres(movieId, genreIds);
 
   const selectAllMovieGenresResult = await pool.query(
     'SELECT * FROM MovieGenres'
@@ -78,12 +79,12 @@ test('Adding movie genres to database for given movie and genres', async () => {
 test('Adding actors to the database', async () => {
   const actors1 = ['Tom Holland', 'Tom Cruise'];
   const actors2 = ['Angelina Jolie', 'Arnold Schwarzenegger', 'Tom Cruise'];
-  const addActors = movies.__get__('addActors');
+  const { addActors } = movies(pool);
 
-  const actors1ids = await addActors(pool, actors1);
+  const actors1ids = await addActors(actors1);
   expect(actors1ids.length).toBe(2);
 
-  const actors2ids = await addActors(pool, actors2);
+  const actors2ids = await addActors(actors2);
   expect(actors2ids.length).toBe(3);
 
   const selectAllActorsResult = await pool.query('SELECT * FROM Actors');
@@ -92,14 +93,12 @@ test('Adding actors to the database', async () => {
 
 test('Adding movie actors to database for given movie and actors', async () => {
   const movieData = sampleMovies[0];
-  const addMovie = movies.__get__('addMovie');
-  const addActors = movies.__get__('addActors');
-  const addMovieActors = movies.__get__('addMovieActors');
+  const { addMovie, addActors, addMovieActors } = movies(pool);
 
-  const movieId = await addMovie(pool, movieData);
-  const actorIds = await addActors(pool, movieData.actors);
+  const movieId = await addMovie(movieData);
+  const actorIds = await addActors(movieData.actors);
 
-  await addMovieActors(pool, movieId, actorIds);
+  await addMovieActors(movieId, actorIds);
 
   const selectAllMovieActorsResult = await pool.query(
     'SELECT * FROM MovieActors'
@@ -110,31 +109,50 @@ test('Adding movie actors to database for given movie and actors', async () => {
 test('Adding directors to the database', async () => {
   const directors1 = ['Zack Snyder', 'Quentin Tarantino'];
   const directors2 = ['Zack Snyder'];
-  const addDirectors = movies.__get__('addDirectors');
+  const { addDirectors } = movies(pool);
 
-  const directors1ids = await addDirectors(pool, directors1);
+  const directors1ids = await addDirectors(directors1);
   expect(directors1ids.length).toBe(2);
 
-  const directors2ids = await addDirectors(pool, directors2);
+  const directors2ids = await addDirectors(directors2);
   expect(directors2ids.length).toBe(1);
 
   const selectAllDirectorsResult = await pool.query('SELECT * FROM Directors');
   expect(selectAllDirectorsResult.rowCount).toBe(2);
 });
 
-test('Adding movie directors to database for given movie and directors', async () => {
+test('Adding movie directors to database for given a movie', async () => {
   const movieData = sampleMovies[0];
-  const addMovie = movies.__get__('addMovie');
-  const addDirectors = movies.__get__('addDirectors');
-  const addMovieDirectors = movies.__get__('addMovieDirectors');
+  const { addMovie, addDirectors, addMovieDirectors } = movies(pool);
 
-  const movieId = await addMovie(pool, movieData);
-  const directorIds = await addDirectors(pool, movieData.directors);
+  const movieId = await addMovie(movieData);
+  const directorIds = await addDirectors(movieData.directors);
 
-  await addMovieDirectors(pool, movieId, directorIds);
+  await addMovieDirectors(movieId, directorIds);
 
   const selectAllMovieDirectorsResult = await pool.query(
     'SELECT * FROM MovieDirectors'
   );
   expect(selectAllMovieDirectorsResult.rowCount).toBe(1);
+});
+
+test('Adding movie suggestion', async () => {
+  const movieData = sampleMovies[0];
+  const { addMovie, addMovieSuggestion } = movies(pool);
+
+  const movieId = await addMovie(movieData);
+  await addTestUsers(pool);
+  const userId = 1;
+
+  const movieSuggestionId = await addMovieSuggestion(movieId, userId);
+
+  const selectMovieSuggestionResult = await pool.query(
+    'SELECT * FROM MovieSuggestions'
+  );
+
+  expect(selectMovieSuggestionResult.rowCount).toBe(1);
+  expect(selectMovieSuggestionResult.rows[0].id).toBe(movieSuggestionId);
+  expect(selectMovieSuggestionResult.rows[0].movie_id).toBe(movieId);
+  expect(selectMovieSuggestionResult.rows[0].user_id).toBe(userId);
+  expect(selectMovieSuggestionResult.rows[0].votes).toBe(0);
 });

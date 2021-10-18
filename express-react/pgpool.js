@@ -5,7 +5,7 @@ const config = {
   port: process.env.PGPORT,
   user: process.env.PGUSER,
   password: process.env.PGPASS,
-  database: process.env.PGDB
+  database: process.env.PGDB,
 };
 
 module.exports = {
@@ -13,5 +13,5 @@ module.exports = {
     if (pool) return pool;
     pool = new Pool(config);
     return pool;
-  }
-}
+  },
+};

@@ -1,14 +1,20 @@
 {
     "cSpell.words": [
-        "JWTSECRET",
-        "PGDB",
-        "PGPASS",
-        "PGPORT",
-        "PGUSER",
+        "antd",
         "chakra",
         "displayname",
+        "hoverable",
+        "JWTSECRET",
+        "navui",
+        "pagelayout",
         "passwordhash",
+        "PGDB",
+        "PGPASS",
         "pgpool",
+        "PGPORT",
+        "PGUSER",
+        "programbutton",
+        "Sider",
         "usertype"
     ]
 }

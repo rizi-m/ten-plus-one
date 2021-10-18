@@ -1,4 +1,4 @@
 express-react/node_modules
 express-react/client/node_modules
 express-react/client/build
-*/.env.local
+*/.env*.local

@@ -1,0 +1,13 @@
+/* Overrides to the grid system */
+
+.grid-vertical-space .row > div {
+  margin: 0.5rem 0;
+}
+
+.row {
+  background-color: red;
+}
+
+.row > div {
+  background-color: blue;
+}

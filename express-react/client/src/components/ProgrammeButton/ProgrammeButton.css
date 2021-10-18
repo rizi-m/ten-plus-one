@@ -1,0 +1,34 @@
+.programme-button.btn {
+  width: 100%;
+  padding-top: 61.8%;
+  position: relative;
+  text-align: start;
+  border: 2px solid black;
+  border-radius: 1rem;
+}
+
+.programme-button > div {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.programme-button_overlay {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    139deg,
+    rgba(255, 255, 255, 1) 0%,
+    rgba(255, 255, 255, 0.8309698879551821) 47%,
+    rgba(255, 255, 255, 0.4416141456582633) 100%
+  );
+  border-radius: 1rem;
+}
+
+.programme-button_content {
+  padding: 2rem 2rem;
+}
+
+.programme-button_content > span {
+  display: block;
+}

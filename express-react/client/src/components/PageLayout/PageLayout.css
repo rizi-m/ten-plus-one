@@ -1,0 +1,45 @@
+.pagelayout {
+  margin: 0 auto;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.pagelayout main {
+  border-top-left-radius: 0.5rem;
+  border-top-right-radius: 0.5rem;
+  border: 3px solid black;
+  margin-top: 1rem;
+  overflow: auto;
+  flex-grow: 1;
+}
+
+@media screen and (max-width: 767px) {
+  .pagelayout.pt-3 {
+    padding-top: 0 !important;
+  }
+}
+
+@media screen and (min-width: 768px) {
+  .pagelayout {
+    max-width: 736px;
+  }
+
+  .pagelayout main {
+    border-top-left-radius: 1rem;
+    border-top-right-radius: 1rem;
+    margin-top: 2rem;
+  }
+}
+
+@media screen and (min-width: 1240px) {
+  .pagelayout {
+    max-width: 1056px;
+  }
+}
+
+@media screen and (min-width: 1920px) {
+  .pagelayout {
+    max-width: 1440px;
+  }
+}

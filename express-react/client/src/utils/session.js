@@ -1,4 +1,4 @@
-import { getCookie } from './cookies';
+import { deleteCookie, getCookie } from './cookies';
 
 export const logIn = () => {
   const token = getCookie('token');
@@ -16,4 +16,14 @@ export const logIn = () => {
     });
   }
   return Promise.reject(new Error(errorMessage));
+};
+
+export const logOut = () => {
+  return fetch('/api/logout').then((res) => {
+    if (res.status === 200) {
+      deleteCookie('token');
+    } else {
+      throw new Error(`Unexpected error - status: ${res.status}`);
+    }
+  });
 };

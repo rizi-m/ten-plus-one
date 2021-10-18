@@ -2,78 +2,96 @@ import { UserContext } from 'context/UserContext';
 import React, { useContext, useState } from 'react';
 import { useHistory } from 'react-router';
 import { setCookie } from 'utils/cookies';
-import FormUI from './FormUI';
+import { Form, Input, Button } from 'antd';
 
 const LoginForm = () => {
   // setup
   const history = useHistory();
   const { setUser } = useContext(UserContext);
-  const [isUsernameInvalid, setIsUsernameInvalid] = useState(false);
-  const [isPasswordInvalid, setIsPasswordInvalid] = useState(false);
   const [authenticationFailed, setAuthenticationFailed] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+
+  const [form] = Form.useForm();
 
   // event handlers
-  const onSubmit = (event) => {
-    event.preventDefault();
-    setIsLoading(true);
-    const form = event.target;
-    const username = form.querySelector('#formUsername').value;
-    const password = form.querySelector('#formPassword').value;
-
-    fetch('/api/login', {
-      method: 'POST',
-      body: JSON.stringify({
-        username: username,
-        password: password,
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-      .then((res) => {
-        if (res.status === 200) {
-          res.json().then((data) => {
-            setUser(data.user);
-            setCookie('token', data.token);
-          });
-          history.push('/dashboard');
-        } else if (res.status === 401) {
-          setAuthenticationFailed(true);
-          setIsUsernameInvalid(true);
-          setIsPasswordInvalid(true);
-        } else {
-          throw new Error(res.error);
-        }
-        setIsLoading(false);
+  const onFinish = (data) => {
+    const { username, password } = data;
+    try {
+      fetch('/api/login', {
+        method: 'POST',
+        body: JSON.stringify({
+          username: username,
+          password: password,
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
       })
-      .catch((err) => {
-        console.error(err);
-        setIsLoading(false);
-      });
-  };
-
-  const checkInputError = (event) => {
-    event.preventDefault();
-    const id = event.target.id;
-    const isInvalid = !event.target.value;
-    const validSetters = {
-      formUsername: setIsUsernameInvalid,
-      formPassword: setIsPasswordInvalid,
-    };
-    validSetters[id](isInvalid);
+        .then((res) => {
+          if (res.status === 200) {
+            res.json().then((data) => {
+              setUser(data.user);
+              setCookie('token', data.token);
+            });
+            history.push('/dashboard');
+          } else if (res.status === 401) {
+            setAuthenticationFailed(true);
+          } else {
+            throw new Error(res.error);
+          }
+        })
+        .catch((err) => {
+          console.error(err);
+        })
+        .finally((_) => {
+          form.validateFields().finally((_) => {
+            setAuthenticationFailed(false);
+          });
+        });
+    } catch (err) {}
   };
 
   return (
-    <FormUI
-      onSubmit={onSubmit}
-      authenticationFailed={authenticationFailed}
-      onErrorClose={() => setAuthenticationFailed(false)}
-      checkInputError={checkInputError}
-      isUsernameInvalid={isUsernameInvalid}
-      isPasswordInvalid={isPasswordInvalid}
-      isLoading={isLoading}
-    />
+    <Form name='login' form={form} onFinish={onFinish}>
+      <Form.Item
+        label='Username'
+        name='username'
+        validateTrigger='onSubmit'
+        rules={[
+          {
+            validator() {
+              if (authenticationFailed) {
+                return Promise.reject('Username may be incorrect');
+              }
+              return Promise.resolve();
+            },
+          },
+        ]}
+      >
+        <Input />
+      </Form.Item>
+      <Form.Item
+        label='Password'
+        name='password'
+        validateTrigger='onSubmit'
+        rules={[
+          {
+            validator() {
+              if (authenticationFailed) {
+                return Promise.reject('Password may be incorrect');
+              }
+              return Promise.resolve();
+            },
+          },
+        ]}
+      >
+        <Input.Password />
+      </Form.Item>
+      <Form.Item>
+        <Button type='primary' htmlType='submit'>
+          Log In
+        </Button>
+      </Form.Item>
+    </Form>
   );
 };
 
